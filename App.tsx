@@ -1,118 +1,93 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import 'react-native-gesture-handler'
+import React from 'react'
+import { createStackNavigator } from '@react-navigation/stack'
+import { CounterScreen } from './src/screens/CounterScreen'
+import { IndexScreen } from './src/screens/IndexScreen'
+import { NavigationContainer } from '@react-navigation/native'
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+  DrawerContentComponentProps,
+  DrawerContentScrollView,
+  createDrawerNavigator,
+} from '@react-navigation/drawer'
+import { Text, TouchableOpacity, View, useWindowDimensions } from 'react-native'
+import Icon from 'react-native-vector-icons/Ionicons'
+import { Styles } from './src/themes/GeneralThemes'
+import { PokemoScreen } from './src/screens/PokemoScreen'
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const Stack = createStackNavigator()
+const Drawer = createDrawerNavigator()
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
+export type RootStackParams = {
+  HomeScreen: undefined;
+  PokemonScreen: { pokemonId: number };
+  SearchScreen: undefined;
 }
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
+function GeneralDrawer() {
+  const { width } = useWindowDimensions()
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+    <Drawer.Navigator
+      screenOptions={{
+        drawerType: width >= 768 ? 'permanent' : 'front',
+      }}
+      drawerContent={(props) => <MenuInterno {...props} />}
+    >
+      <Drawer.Screen name="IndexScreen" component={IndexScreen} />
+      <Drawer.Screen name="CounterScreen" component={CounterScreen} />
+      <Drawer.Screen name="PokemoScreen" component={PokemoScreen} />
+
+
+    </Drawer.Navigator>
+  )
+}
+
+const MenuInterno: React.FC<DrawerContentComponentProps> = ({ navigation }) => {
+  return (
+    <DrawerContentScrollView>
+      <View style={Styles.menuContainer} >
+        <View style={{ flexDirection: 'row', padding: 20 }}>
+          <Icon name="timer" color={'black'} size={25} />
+          <TouchableOpacity
+            onPress={() => navigation.navigate('CounterScreen')}
+          >
+            <Text style={Styles.menuText} >Counter Screen</Text>
+          </TouchableOpacity>
         </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
+        <View style={{ flexDirection: 'row', padding: 20 }}>
+          <Icon name="home" color={'black'} size={25} />
+
+          <TouchableOpacity onPress={() => navigation.navigate('IndexScreen')}>
+            <Text style={Styles.menuText} >Index Screen</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{ flexDirection: 'row', padding: 20 }}>
+          <Icon name="aperture" color={'black'} size={25} />
+
+          <TouchableOpacity onPress={() => navigation.navigate('PokemoScreen')}>
+            <Text style={Styles.menuText} >Api Pokemon</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </DrawerContentScrollView>
+  )
 }
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+function GeneralStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="CounterScreen" component={CounterScreen} />
+      <Stack.Screen name="IndexScreen" component={IndexScreen} />
 
-export default App;
+    </Stack.Navigator>
+  )
+}
+
+const App = () => {
+  return (
+    <NavigationContainer>
+      <GeneralDrawer />
+    </NavigationContainer>
+  )
+}
+
+export default App
